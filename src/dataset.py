@@ -81,22 +81,23 @@ class VoxConverseDataset(Dataset):
     }
 
 def make_collate_fn(hop: int, sample_rate: int):
-  hop_seconds = hop / sample_rate
+  hop_samples = int(hop * sample_rate / 1000)
+  hop_seconds = hop / 1000
 
   def collate_fn(batch):
-    waveforms = [torch.as_tensor(w, dtype=torch.float32) for w, _ in batch]
+    waveforms = [torch.as_tensor(w, dtype=torch.float32) for _, w in batch]
     wav_lengths = [len(w) for w in waveforms]
     waveforms = pad_sequence(waveforms, batch_first=True)
 
     max_size = waveforms.shape[-1]
-    n_frames = ceil(max_size / hop)
+    n_frames = ceil(max_size / hop_samples)
 
     labels = torch.zeros(len(batch), n_frames)
     mask = torch.zeros(len(batch), n_frames, dtype=torch.bool)
 
     for i, ((turns, _), wl) in enumerate(zip(batch, wav_lengths)):
       # calculate number of unpadded samples
-      n_valid = ceil(wl / hop)
+      n_valid = ceil(wl / hop_samples)
 
       # set unpadded samples as true, paddings are false
       mask[i, :n_valid] = True
