@@ -1,10 +1,11 @@
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, Sampler
 from torch.nn.utils.rnn import pad_sequence
 from pathlib import Path
 from math import floor, ceil
 import pandas as pd
 import librosa
 import torch
+import random
 
 RTTM_COLUMNS = [
     "type", "file_id", "channel", "start", "duration",
@@ -119,3 +120,21 @@ def make_collate_fn(hop: int, sample_rate: int):
     return waveforms, labels, mask
 
   return collate_fn
+
+class AudioSampler(Sampler):
+    def __init__(self, lengths, batch_size, shuffle=True):
+        self.lengths = lengths
+        self.batch_size = batch_size
+        self.shuffle = shuffle
+
+    def __iter__(self):
+        idx = sorted(range(len(self.lengths)), key=lambda i: self.lengths[i])
+        batches = [idx[i:i + self.batch_size] for i in range(0, len(idx), self.batch_size)]
+
+        if self.shuffle:
+            random.shuffle(batches)
+
+        yield from batches
+
+    def __len__(self):
+        return (len(self.lengths) + self.batch_size - 1) // self.batch_size
