@@ -1,5 +1,7 @@
 # Option 2. Speaker diarization
 
+HF_TOKE is required for pyannote step and vox_celeb download
+
 ## Pyannote-Based
 
 env file - `pyannote-environment.yml`  
@@ -17,3 +19,4 @@ tutorial's DDEG was using float16 data type that caused overflow on the inferenc
 | pretrained            | 11.1%  |
 | finetuned (1 epoch)   | 10.8%  |
 
+## Custom
