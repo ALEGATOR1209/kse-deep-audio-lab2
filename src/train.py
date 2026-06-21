@@ -7,6 +7,7 @@ from torchmetrics import MetricCollection
 from torchmetrics.classification import (
     BinaryAccuracy, BinaryPrecision, BinaryRecall, BinaryF1Score, BinarySpecificity,
     MultilabelAccuracy, MultilabelPrecision, MultilabelRecall, MultilabelF1Score, MultilabelSpecificity,
+    MulticlassAccuracy, MulticlassPrecision, MulticlassRecall, MulticlassF1Score,
 )
 
 def fmt_metrics(metrics, order=("acc", "P", "R", "F1", "spec")):
@@ -235,5 +236,53 @@ def train_segmentator(
     history["test_spec"].append(test_stats["spec"].item())
     print(f"test  | {fmt_metrics(test_stats)}")
     test_metrics.reset()
+
+  return history
+
+def evaluate_xvector(model, x, loss, metrics, opt=None, i=0, device="cpu"):
+  wav, y = x
+  wav, y = wav.to(device), y.to(device)
+
+  logits = model(wav)
+  lvalue = loss(logits, y)
+
+  if opt:
+    lvalue.backward()
+    opt.step()
+    opt.zero_grad()
+
+  stats = metrics(logits.softmax(-1), y)
+  print(f"  batch {i:3d} | loss {lvalue.item():.4f} | " + fmt_metrics(stats, order=("acc", "P", "R", "F1")))
+
+  return lvalue.item()
+
+def train_xvector(model, device, lr, epochs, train_dl):
+  model.to(device)
+
+  loss = nn.CrossEntropyLoss()
+  opt = torch.optim.Adam(model.parameters(), lr=lr)
+
+  K = model.head.out_features
+  train_metrics = MetricCollection({
+    "acc": MulticlassAccuracy(num_classes=K),
+    "P":   MulticlassPrecision(num_classes=K),
+    "R":   MulticlassRecall(num_classes=K),
+    "F1":  MulticlassF1Score(num_classes=K),
+  }).to(device)
+
+  history = {"train_loss": [], "train_acc": []}
+
+  for epoch in range(epochs):
+    print(f"===== EPOCH {epoch + 1}/{epochs} - train =====")
+    model.train()
+    epoch_loss = 0.0
+    for i, x in enumerate(train_dl):
+      epoch_loss += evaluate_xvector(model, x, loss, train_metrics, opt, i + 1, device)
+
+    train_stats = train_metrics.compute()
+    history["train_loss"].append(epoch_loss / len(train_dl))
+    history["train_acc"].append(train_stats["acc"].item())
+    print(f"train | {fmt_metrics(train_stats, order=('acc', 'P', 'R', 'F1'))}")
+    train_metrics.reset()
 
   return history
