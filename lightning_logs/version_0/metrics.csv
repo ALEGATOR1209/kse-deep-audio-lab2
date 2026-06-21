@@ -1,0 +1,3 @@
+DiarizationErrorRate,DiarizationErrorRate/Confusion,DiarizationErrorRate/DetectionErrorRate,DiarizationErrorRate/FalseAlarm,DiarizationErrorRate/Miss,DiarizationErrorRate/Precision,DiarizationErrorRate/Recall,epoch,loss/train,loss/val,step
+0.07067051529884338,0.027046173810958862,0.04362434521317482,0.023831013590097427,0.019793329760432243,0.9724076986312866,0.9531605243682861,0,,0.19691500067710876,194
+,,,,,,,0,0.20018631219863892,,194

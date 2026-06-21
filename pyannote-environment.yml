@@ -1,0 +1,22 @@
+name: pyannote-env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - ffmpeg
+  - libsndfile
+  - numba
+  - llvmlite
+  - librosa
+  - numpy
+  - scipy
+  - pandas
+  - scikit-learn
+  - matplotlib
+  - ipykernel
+  - jupyter
+  - python-dotenv
+  - huggingface_hub
+  - pip:
+      - pyannote.audio==4.0.4
