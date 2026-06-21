@@ -1,4 +1,6 @@
-# Option 2. Speaker diarization
+# Assignment 2. Option 2. Speaker diarization
+
+Oleh Kovalyshyn, Yevhenii Zasko
 
 HF_TOKE is required for pyannote step and vox_celeb download
 
