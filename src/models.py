@@ -188,7 +188,7 @@ class Segmentator(nn.Module):
     if K < kmax:
         labels = torch.cat([labels, labels.new_zeros(B, W, T, kmax - K)], dim=3)
         K = kmax
-    present = labels.sum(dim=2).int()
+    present = labels.any(dim=2).int()
     _, order = torch.sort(present, dim=-1, descending=True, stable=True)
     idx = order[:, :, None, :kmax].expand(-1, -1, T, -1)
     return torch.gather(labels, 3, idx)
