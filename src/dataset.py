@@ -81,7 +81,18 @@ class VoxConverseDataset(Dataset):
       for ann in self.annotation_files
     }
 
-def make_collate_fn(hop: int, sample_rate: int):
+def find_max_speakers(dataset: VoxConverseDataset):
+    best_file, best_count = None, -1
+
+    for annfile in dataset.annotation_files:
+        turns = dataset._load_annotations(annfile)
+        n = len({t.speaker for t in turns})
+        if n > best_count:
+            best_file, best_count = annfile, n
+
+    return best_file, best_count
+
+def make_agnostic_collate_fn(hop: int, sample_rate: int):
   hop_samples = int(hop * sample_rate / 1000)
   hop_seconds = hop / 1000
 
@@ -116,6 +127,55 @@ def make_collate_fn(hop: int, sample_rate: int):
         # label samples between start and end as speech.
         # non-speech samples would remain 0
         labels[i, start:end] = 1.0
+
+    return waveforms, labels, mask
+
+  return collate_fn
+
+def make_collate_fn(hop: int,  sample_rate: int):
+  hop_samples = int(hop * sample_rate / 1000)
+  hop_seconds = hop / 1000
+
+  def collate_fn(batch):
+    waveforms = [torch.as_tensor(w, dtype=torch.float32) for _, w in batch]
+    wav_lengths = [len(w) for w in waveforms]
+    waveforms = pad_sequence(waveforms, batch_first=True)
+
+    max_size = waveforms.shape[-1]
+    n_frames = ceil(max_size / hop_samples)
+
+    annotations = [a for a, _ in batch]
+    max_speakers = 0
+
+    for a in annotations:
+      speakers = set([t.speaker for t in a])
+      max_speakers = max(len(speakers), max_speakers)
+
+    labels = torch.zeros((len(batch), max_speakers, n_frames))
+    mask = torch.zeros(len(batch), n_frames, dtype=torch.bool)
+
+    for i, ((turns, _), wl) in enumerate(zip(batch, wav_lengths)):
+      # calculate number of unpadded samples
+      n_valid = ceil(wl / hop_samples)
+
+      # set unpadded samples as true, paddings are false
+      mask[i, :n_valid] = True
+
+      for t in turns:
+        # calculate start sample of the speech turn
+        start = floor(t.start / hop_seconds)
+        start = max(0, start)
+
+        # calculate end sample of the speech turn
+        end = t.start + t.duration
+        end = floor(end / hop_seconds)
+        end = min(n_valid, end)
+
+        speaker_num = int(t.speaker.partition('spk')[-1])
+
+        # label samples between start and end as speech **for current speaker**
+        # non-speech samples would remain 0
+        labels[i, speaker_num, start:end] = 1.0
 
     return waveforms, labels, mask
 
