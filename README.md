@@ -70,3 +70,13 @@ The model did not finish training yet (maybe I'll publish results in another bra
 
 1. N. Wilkinson and T. Niesler, "A Hybrid CNN-BiLSTM Voice Activity Detector," 2021, doi: https://arxiv.org/abs/2103.03529
 2. H. Bredin and A. Laurent, “End-To-End Speaker Segmentation for Overlap-Aware Resegmentation,” HAL (Le Centre pour la Communication Scientifique Directe), Aug. 2021, doi: https://doi.org/10.21437/interspeech.2021-560.
+
+# AI Use Disclosure
+
+Claude Code was used for literature review, explaining concepts, idea validation, debugging, generation of specific functions. Most of the code it generated was tweaked.
+
+Our chats:
+
+1. https://claude.ai/share/a70e0cd6-dc5b-4057-a587-a583ba22c7ff
+2. https://claude.ai/share/405cd2b7-a4b5-45a0-a1ad-633d4e8a8f48
+3. https://claude.ai/share/b69f6490-7847-4c92-a6b6-bbb483a672e3
