@@ -67,11 +67,29 @@ The model did not finish training yet (maybe I'll publish results in another bra
   batch 122 | loss 0.1748 | acc 0.952 | P 0.551 | R 0.594 | F1 0.571 | spec 0.861
   batch 123 | loss 0.2483 | acc 0.930 | P 0.836 | R 0.877 | F1 0.854 | spec 0.930
 
+**UPD: 1 epoch training results**  
+train | acc 0.938 | P 0.693 | R 0.763 | F1 0.720 | spec 0.860
+
+## Audio Embeddnigs
+
+EDA of the data showed skew in the nationality, so `StratifiedGroupKFold` with "country" and "gender" fields were chosen to make the distribution as even as possible
+
+For this task the x-vector architecture was chosen[3].
+![](img/xvector_orig_dist.png)
+![](img/xvector_split.png)
+
+Model was trained over 10 epochs with the following result:  
+train | acc 0.823 | P 0.827 | R 0.823 | F1 0.824
+
+![](img/xvector_metrics.png)
+
+Evaluation was done on the test dataset with the EER value EER = **28.65%** which is not great compared to the original paper with 4-7%. More epochs, wider samples or augmented data could be used to improve it.
 
 # References
 
 1. N. Wilkinson and T. Niesler, "A Hybrid CNN-BiLSTM Voice Activity Detector," 2021, doi: https://arxiv.org/abs/2103.03529
 2. H. Bredin and A. Laurent, “End-To-End Speaker Segmentation for Overlap-Aware Resegmentation,” HAL (Le Centre pour la Communication Scientifique Directe), Aug. 2021, doi: https://doi.org/10.21437/interspeech.2021-560.
+3. https://www.danielpovey.com/files/2018_icassp_xvectors.pdf
 
 # AI Use Disclosure
 
@@ -82,3 +100,5 @@ Our chats:
 1. https://claude.ai/share/a70e0cd6-dc5b-4057-a587-a583ba22c7ff
 2. https://claude.ai/share/405cd2b7-a4b5-45a0-a1ad-633d4e8a8f48
 3. https://claude.ai/share/b69f6490-7847-4c92-a6b6-bbb483a672e3
+4. https://claude.ai/chat/8411a442-2d6c-443b-b90a-f53b554896bb
+5. https://claude.ai/chat/62b8ca2a-453e-49f6-85dd-faf7adbaaab6

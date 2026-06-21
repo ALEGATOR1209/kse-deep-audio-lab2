@@ -46,5 +46,5 @@ class XVector(nn.Module):
         emb = self.seg1(h)
         if return_embedding:
             return F.normalize(emb, dim=1)
-        h = self.seg2(torch.relu(self.seg_bn(torch.relu(emb))))
+        h = self.seg2(self.seg_bn(torch.relu(emb)))
         return self.head(h)
