@@ -89,22 +89,37 @@ def evaluate_segmentator(model, x, loss, metrics, opt=None, i=0, device="cpu"):
 
 def plot_history(history):
   xs = range(1, len(history["train_loss"]) + 1)
-  fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(12, 4))
+  fig, ax = plt.subplots(2, 3, figsize=(12, 4))
 
-  ax1.plot(xs, history["train_loss"], marker="o", label="train")
-  ax1.plot(xs, history["test_loss"],  marker="o", label="test")
-  ax1.set(title="Loss", xlabel="epoch", ylabel="loss")
-  ax1.legend()
+  ax[0, 0].plot(xs, history["train_loss"], marker="o", label="train")
+  ax[0, 0].plot(xs, history["test_loss"],  marker="o", label="test")
+  ax[0, 0].set(title="Loss", xlabel="epoch", ylabel="loss")
+  ax[0, 0].legend()
 
-  ax2.plot(xs, history["train_acc"], marker="o", label="train")
-  ax2.plot(xs, history["test_acc"],  marker="o", label="test")
-  ax2.set(title="Accuracy", xlabel="epoch", ylabel="accuracy")
-  ax2.legend()
+  ax[0, 1].plot(xs, history["train_acc"], marker="o", label="train")
+  ax[0, 1].plot(xs, history["test_acc"],  marker="o", label="test")
+  ax[0, 1].set(title="Accuracy", xlabel="epoch", ylabel="accuracy")
+  ax[0, 1].legend()
 
-  ax3.plot(xs, history["train_spec"], marker="o", label="train")
-  ax3.plot(xs, history["test_spec"],  marker="o", label="test")
-  ax3.set(title="Specificity", xlabel="epoch", ylabel="specificity")
-  ax3.legend()
+  ax[0, 2].plot(xs, history["train_spec"], marker="o", label="train")
+  ax[0, 2].plot(xs, history["test_spec"],  marker="o", label="test")
+  ax[0, 2].set(title="Specificity", xlabel="epoch", ylabel="specificity")
+  ax[0, 2].legend()
+
+  ax[1, 0].plot(xs, history["train_rec"], marker="o", label="train")
+  ax[1, 0].plot(xs, history["test_rec"],  marker="o", label="test")
+  ax[1, 0].set(title="Recall", xlabel="epoch", ylabel="recall")
+  ax[1, 0].legend()
+
+  ax[1, 1].plot(xs, history["train_prec"], marker="o", label="train")
+  ax[1, 1].plot(xs, history["test_prec"],  marker="o", label="test")
+  ax[1, 1].set(title="Precision", xlabel="epoch", ylabel="precision")
+  ax[1, 1].legend()
+
+  ax[1, 2].plot(xs, history["train_f1"], marker="o", label="train")
+  ax[1, 2].plot(xs, history["test_f1"],  marker="o", label="test")
+  ax[1, 2].set(title="F1 Score", xlabel="epoch", ylabel="F1 score")
+  ax[1, 2].legend()
 
   fig.tight_layout()
   return fig
@@ -142,6 +157,12 @@ def train_vad(
     "test_acc": [],
     "train_spec": [],
     "test_spec": [],
+    "train_rec": [],
+    "test_rec": [],
+    "train_prec": [],
+    "test_prec": [],
+    "train_f1": [],
+    "test_f1": [],
   }
 
   for epoch in range(epochs):
@@ -155,6 +176,9 @@ def train_vad(
     history["train_loss"].append(epoch_loss / len(dataloader_dev))
     history["train_acc"].append(train_stats["acc"].item())
     history["train_spec"].append(train_stats["spec"].item())
+    history["train_rec"].append(train_stats["R"].item())
+    history["train_prec"].append(train_stats["P"].item())
+    history["train_f1"].append(train_stats["F1"].item())
     print(f"train | {fmt_metrics(train_stats)}")
     train_metrics.reset()
 
@@ -169,6 +193,9 @@ def train_vad(
     history["test_loss"].append(epoch_loss / len(dataloader_test))
     history["test_acc"].append(test_stats["acc"].item())
     history["test_spec"].append(test_stats["spec"].item())
+    history["test_rec"].append(test_stats["R"].item())
+    history["test_prec"].append(test_stats["P"].item())
+    history["test_f1"].append(test_stats["F1"].item())
     print(f"test  | {fmt_metrics(test_stats)}")
     test_metrics.reset()
 
@@ -207,6 +234,12 @@ def train_segmentator(
     "test_acc": [],
     "train_spec": [],
     "test_spec": [],
+    "train_rec": [],
+    "test_rec": [],
+    "train_prec": [],
+    "test_prec": [],
+    "train_f1": [],
+    "test_f1": [],
   }
 
   for epoch in range(epochs):
@@ -220,6 +253,9 @@ def train_segmentator(
     history["train_loss"].append(epoch_loss / len(dataloader_dev))
     history["train_acc"].append(train_stats["acc"].item())
     history["train_spec"].append(train_stats["spec"].item())
+    history["train_rec"].append(train_stats["R"].item())
+    history["train_prec"].append(train_stats["P"].item())
+    history["train_f1"].append(train_stats["F1"].item())
     print(f"train | {fmt_metrics(train_stats)}")
     train_metrics.reset()
 
@@ -234,6 +270,9 @@ def train_segmentator(
     history["test_loss"].append(epoch_loss / len(dataloader_test))
     history["test_acc"].append(test_stats["acc"].item())
     history["test_spec"].append(test_stats["spec"].item())
+    history["test_rec"].append(test_stats["R"].item())
+    history["test_prec"].append(test_stats["P"].item())
+    history["test_f1"].append(test_stats["F1"].item())
     print(f"test  | {fmt_metrics(test_stats)}")
     test_metrics.reset()
 
